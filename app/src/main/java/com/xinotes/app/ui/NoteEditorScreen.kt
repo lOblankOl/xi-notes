@@ -1,5 +1,6 @@
 package com.xinotes.app.ui
 
+import androidx.compose.foundation.layout.weight
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.widget.DatePicker
