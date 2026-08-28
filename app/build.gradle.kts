@@ -43,7 +43,7 @@ android {
     }
     kotlinOptions {
            jvmTarget = "1.8"
-           freeCompilerArgs = freeCompilerArgs + "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi"
+           freeCompilerArgs += listOf("-opt-in=androidx.compose.foundation.ExperimentalFoundationApi")
        }
     buildFeatures {
         compose = true
