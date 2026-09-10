@@ -1,0 +1,6 @@
+<resources>
+    <color name="background_main">#0D1F1A</color>
+    <color name="background_panel">#132A22</color>
+    <color name="accent_primary">#4CAF7D</color>
+    <color name="accent_secondary">#8BC34A</color>
+</resources>
