@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
@@ -22,7 +21,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,14 +47,9 @@ import kotlin.math.roundToInt
  * Локальный список даёт мгновенный визуальный отклик во время перетаскивания;
  * итоговый порядок коммитится через onReorder только при отпускании пальца.
  *
- * ВАЖНО ДЛЯ ИСПОЛНИТЕЛЯ: ROW_HEIGHT_DP ниже — это МИНИМАЛЬНАЯ высота строки (реальная
- * строка теперь растёт под длинные названия, а не обрезается). Расчёт порога
- * перетаскивания (когда именно два элемента меняются местами) по-прежнему считает все
- * строки одной высоты — это приблизительно и при заметках с длинными названиями может
- * потребовать чуть больше протяжки пальцем, чем для коротких, но перетаскивание в любом
- * случае работает корректно, просто не идеально точно по расстоянию для разных по высоте
- * строк. Если это будет ощущаться заметно неудобным — можно позже сделать точный расчёт
- * по фактической высоте каждой строки, это отдельная более сложная правка.
+ * ВАЖНО ДЛЯ ИСПОЛНИТЕЛЯ: ROW_HEIGHT_DP ниже подобран приблизительно (без реального
+ * устройства под рукой). Если протяжка ощущается неточной — просто подогнать это
+ * значение под фактическую высоту строки NoteRow после первого запуска на устройстве.
  */
 private val ROW_HEIGHT_DP = 56
 
@@ -70,18 +63,9 @@ fun ReorderableNoteList(
     onMoveNoteToGroup: (Note, Long?) -> Unit,
     onReorder: (List<Note>) -> Unit
 ) {
-    // БАГ, который был здесь: localOrder кэшировался по списку id заметок, поэтому
-    // переименование (или любое другое изменение поля без изменения состава/порядка)
-    // не долетало до отображения — панель показывала старые данные, пока не менялся
-    // сам список id (например, при создании новой заметки). Теперь localOrder всегда
-    // синхронизируется с актуальными notes, кроме момента активного перетаскивания
-    // (чтобы drag не "прыгал" из-за одновременного обновления от Room).
+    var localOrder by remember(notes.map { it.id }) { mutableStateOf(notes) }
     var draggingId by remember { mutableStateOf<Long?>(null) }
     var dragOffsetPx by remember { mutableStateOf(0f) }
-    var localOrder by remember { mutableStateOf(notes) }
-    LaunchedEffect(notes) {
-        if (draggingId == null) localOrder = notes
-    }
     val density = LocalDensity.current
     val rowHeightPx = with(density) { ROW_HEIGHT_DP.dp.toPx() }
 
@@ -158,14 +142,14 @@ private fun NoteRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = ROW_HEIGHT_DP.dp)
+            .height(ROW_HEIGHT_DP.dp)
             .clickable(onClick = onClick)
-            .padding(horizontal = 8.dp, vertical = 6.dp),
+            .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(note.title.ifBlank { "Без названия" }, fontWeight = FontWeight.Medium)
+            Text(note.title.ifBlank { "Без названия" }, fontWeight = FontWeight.Medium, maxLines = 1)
             Text(
                 fmt.format(Date(note.updatedAt)),
                 style = MaterialTheme.typography.bodySmall,

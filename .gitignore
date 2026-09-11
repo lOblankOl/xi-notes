@@ -1,0 +1,9 @@
+NUL
+temp_project/
+xi-notes-v9/
+*.zip
+session_name.session*
+agent_workspace/
+bridge.py
+requirements.txt
+start_agent.bat

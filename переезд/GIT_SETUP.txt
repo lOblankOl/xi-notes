@@ -1,0 +1,22 @@
+ИНСТРУКЦИЯ ПО НАСТРОЙКЕ GIT ДЛЯ GITHUB
+
+1. Настройка имени и email (выполнить один раз):
+   git config --global user.name "Ваше Имя"
+   git config --global user.email "your_email@example.com"
+
+2. Генерация SSH-ключа (для безопасного доступа к GitHub):
+   ssh-keygen -t ed25519 -C "your_email@example.com"
+   (Нажимайте Enter для всех предложенных путей и пароля)
+
+3. Добавление ключа в SSH-агент:
+   eval "$(ssh-agent -s)"
+   ssh-add ~/.ssh/id_ed25519
+
+4. Копирование публичного ключа:
+   cat ~/.ssh/id_ed25519.pub
+   (Скопируйте полученный вывод)
+
+5. Вставка на GitHub:
+   Перейдите в Settings -> SSH and GPG keys -> New SSH key. Вставьте скопированный ключ туда.
+
+Теперь вы готовы работать с GitHub через SSH!
