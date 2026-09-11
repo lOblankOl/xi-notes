@@ -59,6 +59,7 @@ fun DrawerContent(
 ) {
     var showNewGroupDialog by remember { mutableStateOf(false) }
     var expandedGroups by remember { mutableStateOf(setOf<Long>()) }
+    var remindersExpanded by remember { mutableStateOf(true) }
 
     Column(modifier = Modifier.fillMaxSize().padding(8.dp)) {
         Row(
@@ -76,9 +77,30 @@ fun DrawerContent(
 
             // --- Секция "Напоминания" (заметки целиком + отдельные пункты чек-листов) ---
             if (uiState.reminders.isNotEmpty()) {
-                item { SectionHeader("Напоминания") }
-                items(uiState.reminders, key = { "rem-${it.noteId}-${it.itemId}" }) { entry ->
-                    ReminderRow(entry = entry, onClick = { onNoteSelected(entry.noteId) })
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { remindersExpanded = !remindersExpanded }
+                            .padding(vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            if (remindersExpanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                            contentDescription = null
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            "Напоминания",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
+                    }
+                }
+                if (remindersExpanded) {
+                    items(uiState.reminders, key = { "rem-${it.noteId}-${it.itemId}" }) { entry ->
+                        ReminderRow(entry = entry, onClick = { onNoteSelected(entry.noteId) })
+                    }
                 }
                 item { Spacer(modifier = Modifier.height(12.dp)) }
             }

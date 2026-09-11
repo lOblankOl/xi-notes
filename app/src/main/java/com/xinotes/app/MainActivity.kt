@@ -41,6 +41,21 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    // ВАЖНО: активность объявлена launchMode="singleTask". Если приложение уже открыто
+    // (например, свёрнуто в фон), тап по уведомлению-напоминанию НЕ вызывает onCreate()
+    // заново — система доставляет новый Intent именно сюда, в onNewIntent(). Без этого
+    // переопределения "openNoteId" из уведомления просто терялся, и приложение оставалось
+    // на той заметке, что была открыта до этого, вместо той, к которой относится
+    // напоминание.
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        val openNoteId = intent.getLongExtra("openNoteId", -1L).takeIf { it != -1L }
+        if (openNoteId != null) {
+            viewModel.selectNote(openNoteId)
+        }
+    }
+
     private fun requestNotificationPermissionIfNeeded() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)

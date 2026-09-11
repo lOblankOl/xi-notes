@@ -335,6 +335,7 @@ fun NoteEditorScreen(
                                     blocks = mutable
                                     focusedBlockIndex = index
                                     commitDebounced()
+                                    scope.launch { bringIntoViewRequester.bringIntoView() }
                                 },
                                 modifier = Modifier
                                     .weight(1f)
@@ -410,6 +411,10 @@ fun NoteEditorScreen(
                                 blocks = mutable
                                 focusedBlockIndex = index
                                 commitDebounced()
+                                // Заметка растёт по мере набора — курсор уезжает вниз, поэтому
+                                // подтягиваем видимую область заново на КАЖДОЕ изменение текста,
+                                // а не только один раз при получении фокуса.
+                                scope.launch { bringIntoViewRequester.bringIntoView() }
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
